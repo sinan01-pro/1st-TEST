@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 20% 96%;
+    --foreground: 0 0% 4%;
+    --card: 40 20% 96%;
+    --card-foreground: 0 0% 4%;
+    --popover: 40 20% 96%;
+    --popover-foreground: 0 0% 4%;
+    --primary: 0 0% 4%;
+    --primary-foreground: 40 20% 96%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 40 20% 96%;
+    --muted: 40 10% 90%;
+    --muted-foreground: 45 2% 60%;
+    --accent: 40 10% 90%;
+    --accent-foreground: 0 0% 4%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 4% / 0.1;
+    --input: 0 0% 4% / 0.1;
+    --ring: 0 0% 4%;
+    --radius: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-ivory text-obsidian font-sans antialiased;
+    letter-spacing: -0.01em;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    letter-spacing: -0.02em;
+  }
+
+  ::selection {
+    background-color: #0a0a0a;
+    color: #f7f5f0;
+  }
+}
+
+@layer components {
+  .btn-primary-dark {
+    @apply bg-obsidian text-ivory px-10 py-4 font-sans font-medium text-base uppercase tracking-widest transition-all duration-300 hover:bg-charcoal hover:scale-[1.02];
+  }
+
+  .btn-primary-light {
+    @apply bg-ivory text-obsidian px-10 py-4 font-sans font-medium text-base uppercase tracking-widest transition-all duration-300 hover:bg-warmgray;
+  }
+
+  .btn-secondary-outline {
+    @apply bg-transparent text-obsidian border border-obsidian px-9 py-3.5 font-sans font-medium text-base uppercase tracking-widest transition-all duration-300 hover:bg-obsidian hover:text-ivory;
+  }
+
+  .container-velaro {
+    @apply max-w-[1280px] mx-auto px-5 md:px-8;
+  }
+
+  .section-padding {
+    @apply py-16 md:py-20 lg:py-[120px];
+  }
+
+  .border-light {
+    border-color: rgba(38, 38, 38, 0.1);
+  }
+
+  .border-dark {
+    border-color: rgba(247, 245, 240, 0.1);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f7f5f0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #9e9d99;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #262626;
+}
