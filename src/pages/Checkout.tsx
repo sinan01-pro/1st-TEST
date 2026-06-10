@@ -5,6 +5,7 @@ import { useCart } from '@/stores/useCart';
 import { divisions, districtsByDivision } from '@/data/products';
 import { useToast } from '@/stores/useToast';
 import SectionReveal from '@/components/SectionReveal';
+import { supabase } from '@/lib/supabase';
 
 export default function Checkout() {
   const { items, subtotal, clearCart } = useCart();
@@ -33,40 +34,44 @@ export default function Checkout() {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate order processing
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    const orderId = `VELARO-${Date.now()}`;
 
-    // Send order confirmation email
-    const orderDetails = {
-      customerName: name,
-      phone: phone,
-      email: email,
-      address: address,
-      district: district,
-      division: division,
-      postalCode: postalCode,
+    const body = {
+      customer_name: name,
+      customer_email: email,
+      customer_phone: phone,
+      customer_address: `${address}, ${district}, ${division}, ${postalCode}`,
       items: items.map(item => ({
-        product: item.product.name,
+        name: item.product.name,
         quantity: item.quantity,
         size: item.size,
         color: item.color,
-        price: item.product.discountPrice || item.product.price
+        price: item.product.discountPrice || item.product.price,
       })),
-      totalAmount: grandTotal,
-      paymentMethod: paymentMethod === 'cod' ? 'Cash on Delivery' : 'bKash',
-      shippingMethod: shippingMethod,
-      notes: notes,
-      orderDate: new Date().toISOString()
+      total_amount: grandTotal,
+      payment_method: paymentMethod === 'cod' ? 'Cash on Delivery' : 'bKash',
+      shipping_method: shippingMethod,
+      notes,
+      order_id: orderId,
     };
 
-    // In a real implementation, this would be sent to your backend
-    console.log('Order Details:', orderDetails);
-    console.log('Order confirmation would be sent to: sinangtp01@gmail.com');
+   try {
+  const { error } = await supabase
+    .from('orders')
+    .insert([body]);
 
-    clearCart();
-    setLoading(false);
-    addToast('Order placed successfully!', 'success');
-    navigate('/order-success');
+  if (error) throw error;
+
+  clearCart();
+  addToast('Order placed successfully!', 'success');
+  navigate('/order-success');
+} catch (error) {
+  console.error('Supabase Error:', error);
+alert(JSON.stringify(error));
+addToast('Unable to place order. Please try again.', 'error');
+} finally {
+  setLoading(false);
+}
   };
 
   if (items.length === 0) {
@@ -113,9 +118,11 @@ export default function Checkout() {
               <div className="flex items-center gap-2 mb-10">
                 {['Information', 'Shipping', 'Payment'].map((step, i) => (
                   <div key={step} className="flex items-center gap-2">
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${
-                      i === 0 ? 'bg-obsidian text-ivory' : 'border border-warmgray text-warmgray'
-                    }`}>
+                    <div
+                      className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${
+                        i === 0 ? 'bg-obsidian text-ivory' : 'border border-warmgray text-warmgray'
+                      }`}
+                    >
                       {i + 1}
                     </div>
                     <span className={`text-sm ${i === 0 ? 'text-obsidian font-medium' : 'text-warmgray'}`}>
@@ -176,13 +183,18 @@ export default function Checkout() {
                     </div>
                     <select
                       value={division}
-                      onChange={(e) => { setDivision(e.target.value); setDistrict(''); }}
+                      onChange={(e) => {
+                        setDivision(e.target.value);
+                        setDistrict('');
+                      }}
                       required
                       className="w-full px-4 py-3.5 border border-light bg-transparent font-sans text-base focus:outline-none focus:border-obsidian transition-colors appearance-none cursor-pointer"
                     >
                       <option value="">Select Division *</option>
                       {divisions.map((d) => (
-                        <option key={d} value={d}>{d}</option>
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
                       ))}
                     </select>
                     <select
@@ -194,7 +206,9 @@ export default function Checkout() {
                     >
                       <option value="">Select District *</option>
                       {availableDistricts.map((d) => (
-                        <option key={d} value={d}>{d}</option>
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
                       ))}
                     </select>
                     <textarea
@@ -388,7 +402,9 @@ export default function Checkout() {
         <div className="container-velaro text-center">
           <p className="text-xs text-warmgray">&copy; 2025 VELARO. All rights reserved.</p>
           <div className="flex items-center justify-center gap-4 mt-2 text-xs text-warmgray">
-            <span className="flex items-center gap-1"><Lock size={12} /> Secure Checkout</span>
+            <span className="flex items-center gap-1">
+              <Lock size={12} /> Secure Checkout
+            </span>
             <span>bKash Verified</span>
             <span>COD Available</span>
           </div>
